@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Каталог товаров</title>
+    <style>
+        body { 
+        font-family: Arial, sans-serif; 
+        margin: 20px; 
+        }
+        
+        body.theme-dark {
+            background-color: black;
+            color: #fff;
+        }
+
+        .card { 
+        border: 1px solid #ccc; 
+        padding: 15px; 
+        margin: 10px; 
+        border-radius: 8px; 
+        max-width: 300px; 
+        }
+
+        body.theme-dark .card {
+            background-color: rgb(27, 26, 26);
+        }
+
+        .card img { 
+        width: 100%; 
+        height: 150px; 
+        object-fit: cover; 
+        border-radius: 4px; 
+        }
+
+        .cards-container { 
+        display: flex; 
+        flex-wrap: wrap; 
+        gap: 20px; 
+        }
+
+        .out-of-stock { 
+        color: red; 
+        font-weight: bold; 
+        }
+
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <script type="text/babel">
+        function useTheme() {
+            const getInitialTheme = () => {
+                const saved = localStorage.getItem('theme');
+                return saved === 'dark' || saved === 'light' ? saved : 'light';
+            };
+
+            const [theme, setTheme] = React.useState(getInitialTheme);
+
+            const toggleTheme = () => {
+                const newTheme = theme === 'light' ? 'dark' : 'light';
+                setTheme(newTheme);
+                localStorage.setItem('theme', newTheme);
+            };
+
+            React.useEffect(() => {
+                document.body.className = theme === 'dark' ? 'theme-dark' : '';   
+            }, [theme]);
+            return {theme, toggleTheme};
+        }
+
+        //ThemeToggle
+
+        function ThemeToggle() {
+            const {toggleTheme, theme} = useTheme();
+
+            return (
+                <button onClick={toggleTheme}>
+                    Переключить на {theme === 'light' ? 'темную' : 'светлую'} тему
+                </button>
+            );
+        }
+
+        function ProductCard({ title, description, price, image, inStock }) {
+            return (
+                <div className="card">
+                    <img src={image} alt={title} />
+                    <h3>{title}</h3>
+                    <p>{description}</p>
+                    <strong>{price}</strong>
+                    {!inStock && <p className="out-of-stock">Нет в наличии</p>}
+                </div>
+            );
+        }
+
+        const products = [
+            { 
+                id: 1, 
+                title: "Ноутбук", 
+                description: "Мощный ультрабук", 
+                price: "89990 руб.", 
+                image: "https://avatars.mds.yandex.net/i?id=0d943a4f5073abca82bf29c6da042351_sr-5882870-images-thumbs&n=13",
+                inStock: true
+            },
+            { 
+                id: 2, 
+                title: "Смартфон", 
+                description: "Флагманский смартфон", 
+                price: "59990 руб.", 
+                image: "https://cdn1.ozone.ru/s3/multimedia-j/6315383347.jpg",
+                inStock: true
+            },
+            { 
+                id: 3, 
+                title: "Планшет", 
+                description: "Легкий и производительный", 
+                price: "45990 руб.", 
+                image: "https://avatars.mds.yandex.net/i?id=caea0f66de9cd8613d600983c0e295366a6594cd-12531500-images-thumbs&n=13",
+                inStock: false
+            },
+            { 
+                id: 4, 
+                title: "Наушники", 
+                description: "Беспроводные с шумоподавлением", 
+                price: "12990 руб.", 
+                image: "https://avatars.mds.yandex.net/i?id=01460c5527f8a107c5bb51ac9dcbf2cc_l-4289847-images-thumbs&n=13",
+                inStock: true
+            }
+        ];
+
+        function ProductList() {
+            return (
+                <div className="cards-container">
+                    {products.map(product => (
+                        <ProductCard 
+                            key={product.id}
+                            title={product.title}
+                            description={product.description}
+                            price={product.price}
+                            image={product.image}
+                            inStock={product.inStock}
+                        />
+                    ))}
+                </div>
+            );
+        }
+
+        function Header({ title, subtitle }) {
+            return (
+                <header>
+                    <h1>{title}</h1>
+                    {subtitle && <h2>{subtitle}</h2>}
+                </header>
+            );
+        }
+
+        function CardWrapper({ children }) {
+            return (
+                <div style={{ 
+                    border: '1px solid #ddd', 
+                    padding: '20px', 
+                    borderRadius: '10px', 
+                    margin: '20px 0',
+                    backgroundColor: '#f9f9f9'
+                }}>
+                    {children}
+                </div>
+            );
+        }
+
+        function App() {
+            return (
+                <div>
+                    <Header 
+                        title="Каталог товаров" 
+                        subtitle="Лучшие предложения этой недели" 
+                    />
+
+                    <div>
+                        <ThemeToggle />    
+                    </div>
+
+                    <CardWrapper>
+                        <ProductList />
+                    </CardWrapper>
+                </div>
+            );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
+
